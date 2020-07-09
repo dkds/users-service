@@ -1,0 +1,7 @@
+spring:
+  main:
+    banner-mode: "off"
+
+service:
+  todos:
+    base-url: http://todos-service:8084

@@ -1,0 +1,8 @@
+server:
+  port: ${PORT:8082}
+
+service:
+  mock:
+    base-url: https://jsonplaceholder.typicode.com
+  todos:
+    base-url: http://localhost:8084
