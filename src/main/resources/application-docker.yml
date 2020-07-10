@@ -4,4 +4,6 @@ spring:
 
 service:
   todos:
-    base-url: http://todos-service:8084
+    base-url: http://${SERVICE_HOST_TODOS}:${SERVICE_PORT_TODOS}
+  kafka:
+    base-url: http://${SERVICE_HOST_KAFKA}:${SERVICE_PORT_KAFKA}

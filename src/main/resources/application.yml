@@ -6,3 +6,5 @@ service:
     base-url: https://jsonplaceholder.typicode.com
   todos:
     base-url: http://localhost:8084
+  kafka:
+    base-url: http://127.0.0.1:9092

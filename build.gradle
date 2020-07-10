@@ -1,6 +1,8 @@
 plugins {
     id 'org.springframework.boot' version '2.3.1.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'com.palantir.docker' version '0.25.0'
+    id 'com.palantir.docker-run' version '0.25.0'
     id 'java'
 }
 
@@ -17,6 +19,12 @@ configurations {
 repositories {
     mavenCentral()
 }
+
+docker {
+    name 'dkds/users-service:latest'
+    copySpec.from("build").into("build")
+}
+docker.dependsOn(build as Task)
 
 ext {
     set('springCloudVersion', "Hoxton.SR6")
@@ -46,4 +54,4 @@ task unpack(type: Copy) {
     from zipTree(zipFile)
     into outputDir
 }
-build.finalizedBy(unpack)
+(build as Task).finalizedBy(['unpack', 'docker'])
