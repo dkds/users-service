@@ -4,4 +4,9 @@ spring:
   cloud:
     consul:
       discovery:
+        prefer-ip-address: true
         instanceId: ${spring.application.name}:${random.value}
+      host: ${SERVICE_HOST_CONSUL:localhost}
+      port: ${SERVICE_PORT_CONSUL:8500}
+      config:
+        enabled: true

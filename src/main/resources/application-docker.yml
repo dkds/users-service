@@ -1,13 +1,9 @@
 spring:
   main:
     banner-mode: "off"
-  cloud:
-    consul:
-      host: ${SERVICE_HOST_CONSUL}
-      port: ${SERVICE_HOST_CONSUL}
 
 service:
   todos:
-    base-url: http://${SERVICE_HOST_TODOS}:${SERVICE_PORT_TODOS}
+    base-url: http://${SERVICE_LOCATION_TODOS}
   kafka:
-    base-url: http://${SERVICE_HOST_KAFKA}:${SERVICE_PORT_KAFKA}
+    base-url: http://${SERVICE_LOCATION_KAFKA}
