@@ -1,15 +1,15 @@
 package com.test.elk.userservice;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.client.loadbalancer.reactive.ReactorLoadBalancerExchangeFilterFunction;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
@@ -19,22 +19,48 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 @Slf4j
 @SpringBootApplication
 public class Application {
 
+    @Value("${service.mock.base-url}")
+    String mockBaseUrl;
+    @Value("${service.todos.base-url}")
+    String todosBaseUrl;
+
     public static void main(String[] args) {
         SpringApplication.run(Application.class);
+    }
+
+    private static ExchangeFilterFunction logRequest() {
+        return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
+            log.info("Request: {} {}", clientRequest.method(), clientRequest.url());
+            clientRequest.headers().forEach((name, values) -> values.forEach(value -> log.info("Request Header {}={}", name, value)));
+            return Mono.just(clientRequest);
+        });
+    }
+
+    @Bean
+    @Qualifier("mockService")
+    public WebClient webClientMockService(WebClient.Builder webClientBuilder) {
+        return webClientBuilder.baseUrl(mockBaseUrl).filter(logRequest()).build();
+    }
+
+    @Bean
+    @Qualifier("todosService")
+    @LoadBalanced
+    public WebClient webClientTodosService(WebClient.Builder webClientBuilder, ReactorLoadBalancerExchangeFilterFunction lbFunction) {
+        return webClientBuilder.baseUrl(todosBaseUrl).filter(lbFunction).build();
     }
 
     @RestController
@@ -108,31 +134,6 @@ public class Application {
                     });
         }
 
-    }
-
-    @Value("${service.mock.base-url}")
-    String mockBaseUrl;
-    @Value("${service.todos.base-url}")
-    String todosBaseUrl;
-
-    @Bean
-    @Qualifier("mockService")
-    public WebClient webClientMockService(WebClient.Builder webClientBuilder) {
-        return webClientBuilder.baseUrl(mockBaseUrl).filter(logRequest()).build();
-    }
-
-    @Bean
-    @Qualifier("todosService")
-    public WebClient webClientTodosService(WebClient.Builder webClientBuilder) {
-        return webClientBuilder.baseUrl(todosBaseUrl).build();
-    }
-
-    private static ExchangeFilterFunction logRequest() {
-        return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
-            log.info("Request: {} {}", clientRequest.method(), clientRequest.url());
-            clientRequest.headers().forEach((name, values) -> values.forEach(value -> log.info("Request Header {}={}", name, value)));
-            return Mono.just(clientRequest);
-        });
     }
 
     @Data

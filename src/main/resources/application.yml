@@ -1,10 +1,16 @@
 server:
   port: ${PORT:8082}
 
+spring:
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+
 service:
   mock:
     base-url: https://jsonplaceholder.typicode.com
   todos:
-    base-url: http://localhost:8084
+    base-url: http://todos-service/
   kafka:
     base-url: http://127.0.0.1:9092

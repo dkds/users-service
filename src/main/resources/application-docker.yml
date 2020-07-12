@@ -1,6 +1,10 @@
 spring:
   main:
     banner-mode: "off"
+  cloud:
+    consul:
+      host: ${SERVICE_HOST_CONSUL}
+      port: ${SERVICE_HOST_CONSUL}
 
 service:
   todos:
