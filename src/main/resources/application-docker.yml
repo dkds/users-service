@@ -1,6 +1,8 @@
 spring:
   main:
     banner-mode: "off"
+  zipkin:
+    base-url: http://${SERVICE_LOCATION_ZIPKIN}
 
 service:
   todos:

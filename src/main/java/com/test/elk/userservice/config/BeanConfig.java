@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
-import org.springframework.cloud.client.loadbalancer.reactive.ReactorLoadBalancerExchangeFilterFunction;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
@@ -37,7 +36,7 @@ public class BeanConfig {
     @Bean
     @Qualifier("todosService")
     @LoadBalanced
-    public WebClient webClientTodosService(WebClient.Builder webClientBuilder, ReactorLoadBalancerExchangeFilterFunction lbFunction) {
-        return webClientBuilder.baseUrl(todosBaseUrl).filter(lbFunction).build();
+    public WebClient webClientTodosService(WebClient.Builder webClientBuilder) {
+        return webClientBuilder.baseUrl(todosBaseUrl).build();
     }
 }

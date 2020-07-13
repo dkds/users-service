@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +38,9 @@ public class UserController {
     @Qualifier("mockService")
     private WebClient webClientMockService;
 
+    @Value("${todos-service.todos-per-user}")
+    private Integer todosPerUser;
+
     @GetMapping
     public List<User> getUsers() {
         log.info("Getting users");
@@ -64,7 +68,7 @@ public class UserController {
 
         if (body.isPresent()) {
             log.info("Getting todos for user: {}", id);
-            List<Todo> todoList = Flux.fromStream(IntStream.range(id * 10, (id * 10) + 10).boxed())
+            List<Todo> todoList = Flux.fromStream(IntStream.range(id * 10, (id * 10) + todosPerUser).boxed())
                     .parallel()
                     .runOn(Schedulers.elastic())
                     .flatMap(this::getTodo)
